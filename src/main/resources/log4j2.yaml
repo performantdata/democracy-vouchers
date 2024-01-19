@@ -1,0 +1,48 @@
+Configuration:
+  status: warn
+  name: democracy-vouchers
+  thresholdFilter:
+    level: debug
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%message%n"
+
+    RollingFile:
+      name: RollingFile
+      fileName: logs/server.log
+      filePattern: logs/server.%d{yyyy-MM-dd}.%i.log.xz
+      Filters:
+        ThresholdFilter:
+          level: debug
+      PatternLayout:
+        Pattern: "%date{ISO8601_PERIOD_MICROS}{GMT} %level %logger [%threadName] %message%n"
+        # %date{yyyy-MM-dd'T'HH:mm:ss.nnnnnnX} doesn't work.
+        # https://issues.apache.org/jira/browse/LOG4J2-2885 didn't fix that.
+      Policies:
+        OnStartupTriggeringPolicy: {}
+        TimeBasedTriggeringPolicy: {}
+        SizeBasedTriggeringPolicy:
+          size: 250MB
+      DefaultRolloverStrategy:
+        max: 20
+
+  Loggers:
+    logger:
+      - name: com.zaxxer.hikari.pool.HikariPool
+        level: info
+      - name: slick.basic
+        level: info
+      - name: slick.compiler
+        level: info
+      - name: slick.compiler.QueryCompilerBenchmark
+        level: debug
+
+    Root:
+      level: debug
+      AppenderRef:
+        ref: STDOUT
+      AppenderRef:
+        ref: RollingFile

@@ -1,0 +1,9 @@
+# sbt
+/target/
+
+# npm
+/node_modules/
+
+# Parcel
+/.parcel-cache/
+/dist/
