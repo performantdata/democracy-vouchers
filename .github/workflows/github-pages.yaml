@@ -1,0 +1,58 @@
+# Publish the generated static site to GitHub Pages.
+
+name: GitHub Pages
+run-name: publication from ${{ github.sha }}
+on:
+  workflow_dispatch:
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    name: Deliver GitHub Pages artifact
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repository
+      uses: actions/checkout@v4
+
+    - name: Install Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: latest
+
+    - name: Generate the static site
+      working-directory: ./static
+      run: |
+        npm install
+        npm run build-github-pages
+
+    - name: Fix permissions
+      working-directory: ./static/target/web/stage/
+      run: |
+        chmod -c -R +rX . | while read line; do
+          echo "::warning title=Invalid file permissions automatically fixed::$line"
+        done
+
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: static/target/web/stage/
+
+  deploy:
+    name: Deploy GitHub Pages artifact
+    needs: deliver
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

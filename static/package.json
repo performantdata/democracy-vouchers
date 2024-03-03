@@ -18,6 +18,8 @@
     "build": "run-s clean build:eleventy build:parcel",
     "build:eleventy": "npx @11ty/eleventy",
     "build:parcel": "parcel build --no-cache",
+    "build-github-pages": "run-s clean build:eleventy build-github-pages:parcel",
+    "build-github-pages:parcel": "parcel build --no-cache --public-url /democracy-vouchers/",
     "clean": "rm -rf target/web/public/main/ target/web/stage/",
     "start": "run-p start:eleventy start:parcel",
     "start:eleventy": "npx @11ty/eleventy --watch",
@@ -48,7 +50,7 @@
         "target/web/public/main/graphiql/index.html",
         "target/web/public/main/redeemed-vouchers/index.html",
         "target/web/public/main/voter-guide/index.html",
-        "target/web/public/main/voter-guide/2026/index.html",
+        "target/web/public/main/voter-guide/2024/index.html",
         "target/web/public/main/voucher/index.html"
       ],
       "distDir": "target/web/stage/"
