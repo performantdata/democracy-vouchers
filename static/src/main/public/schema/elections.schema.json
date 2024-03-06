@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://performantdata.github.io/democracy-vouchers/schema/elections.schema.json",
+  "title": "Elections",
+  "description": "A set of elections in a particular government jurisdiction",
+  "type": "array",
+  "minItems": 1,
+  "uniqueItems": true,
+  "items": {
+    "$ref": "https://performantdata.github.io/democracy-vouchers/schema/election.schema.json"
+  }
+}

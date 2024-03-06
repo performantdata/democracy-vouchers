@@ -50,7 +50,6 @@
         "target/web/public/main/graphiql/index.html",
         "target/web/public/main/redeemed-vouchers/index.html",
         "target/web/public/main/voter-guide/index.html",
-        "target/web/public/main/voter-guide/2024/index.html",
         "target/web/public/main/voucher/index.html"
       ],
       "distDir": "target/web/stage/"

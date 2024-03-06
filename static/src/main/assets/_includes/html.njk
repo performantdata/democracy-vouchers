@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   {# See https://www.w3.org/TR/css-viewport-1/ -#}
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Copyright © 2024 Michael. All rights reserved. -->  {#- Test of UTF-8. #}
   <title>{{ title }}</title>
   <link rel="stylesheet" href="{{ page.url | relativeRoot }}css/overview.css" />
   <meta name="theme-color" content="#fafafa" />
@@ -14,7 +13,6 @@
   <meta name="geo.a1" content="CA" />
   <meta name="geo.a2" content="Alameda" />
   <meta name="geo.a3" content="Oakland" />
-  <meta name="subject-datetime" content="2024" />  {#- TODO: Partition site by year, keeping old years. #}
   {{ headContent | safe | indent(2) -}}
 </head>
 <body>

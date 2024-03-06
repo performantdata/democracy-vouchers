@@ -1,0 +1,31 @@
+[
+  {
+    "year": 2024,
+    "governmentLevels": [
+      {
+        "governmentLevel": "federal",
+        "races": [
+          {
+
+          }
+        ]
+      },
+      {
+        "governmentLevel": "state",
+        "races": [
+          {
+
+          }
+        ]
+      },
+      {
+        "governmentLevel": "city",
+        "races": [
+          {
+
+          }
+        ]
+      }
+    ]
+  }
+]

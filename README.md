@@ -15,8 +15,16 @@ but also introduce new security considerations.
 
 ## running the application
 
-This software runs as a Docker application.
+This software runs as a Docker application.<sup>*</sup>
 It requires installing the `docker` command line application.
+
+The project includes a GitHub Actions workflow that publishes the **static site content** to GitHub Pages.
+These pages may not be fully functional without the back-end services, of course,
+but it provides a quick way to share that part of the system.
+
+<sup>*</sup>&nbsp;This isn't entirely true yet.
+The back end can run in a Docker container, but we're not using it in the project yet.
+And the front end isn't configured for Docker deployment yet.
 
 ## developing the application
 
