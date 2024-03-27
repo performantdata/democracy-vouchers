@@ -1,0 +1,21 @@
+---
+pagination:
+  data: elections
+  size: 1
+  alias: election
+permalink: "voter-guide/{{ election.year }}/"
+
+layout: public-page
+
+lang: en
+eleventyComputed:
+  title: Voter Guide {{ election.year }}
+  headContent: |
+    <meta name="description" content="A guide to the candidates for the {{ election.year }} election." />
+    <meta name="subject-datetime" content="{{ election.year }}" />
+---
+<main>
+  <ul>
+
+  </ul>
+</main>

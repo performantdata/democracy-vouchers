@@ -28,7 +28,7 @@ jobs:
       working-directory: ./static
       run: |
         npm install
-        npm run build-github-pages
+        npm run build-ghpages
 
     - name: Fix permissions
       working-directory: ./static/target/web/stage/

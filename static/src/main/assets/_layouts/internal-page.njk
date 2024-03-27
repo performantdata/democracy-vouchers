@@ -5,14 +5,13 @@
   {# See https://www.w3.org/TR/css-viewport-1/ -#}
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ title }}</title>
-  <link rel="stylesheet" href="{{ page.url | relativeRoot }}css/overview.css" />
-  <meta name="theme-color" content="#fafafa" />
+  <link rel="stylesheet" href="/css/overview.css" />
+  <meta name="theme-color" content="{{ site.themeColor }}" />
   <meta name="generator" content="{{ eleventy.generator }}" />
-  {# TODO: Move location data to config. -#}
-  <meta name="geo.country" content="us" />
-  <meta name="geo.a1" content="CA" />
-  <meta name="geo.a2" content="Alameda" />
-  <meta name="geo.a3" content="Oakland" />
+  <meta name="geo.country" content="{{ site.location.country }}" />
+  <meta name="geo.a1" content="{{ site.location.state }}" />
+  <meta name="geo.a2" content="{{ site.location.county }}" />
+  <meta name="geo.a3" content="{{ site.location.city }}" />
   {{ headContent | safe | indent(2) -}}
 </head>
 <body>

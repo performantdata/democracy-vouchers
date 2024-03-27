@@ -4,6 +4,5 @@
 # npm
 /node_modules/
 
-# Parcel
-/.parcel-cache/
-/dist/
+# @11ty/eleventy-plugin-vite
+/.11ty-vite/

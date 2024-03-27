@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8" />
+  {# See https://www.w3.org/TR/css-viewport-1/ -#}
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/css/overview.css" />
+  <meta name="theme-color" content="{{ site.themeColor }}" />
+  <meta name="generator" content="{{ eleventy.generator }}" />
+  <meta name="geo.country" content="{{ site.location.country }}" />
+  <meta name="geo.a1" content="{{ site.location.state }}" />
+  <meta name="geo.a2" content="{{ site.location.county }}" />
+  <meta name="geo.a3" content="{{ site.location.city }}" />
+  {{ headContent | safe | indent(2) -}}
+</head>
+<body>
+{{ content | safe -}}
+</body>
+</html>
