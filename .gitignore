@@ -1,11 +1,16 @@
+*.log
+
+# Scala
+*.class
+
 # sbt
 /project/project/
 /project/target/
 /target/
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 /.bsp/
 /.idea/
 
-### Mac OS ###
+# Mac OS
 .DS_Store

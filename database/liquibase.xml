@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+>
+    <changeSet id="1" author="UNKNOWN">
+        <createTable tableName="person" remarks="An instance of Homo sapiens.">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="personal_name" remarks="A name of a person.">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="person_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="person" referencedColumnNames="id"
+                             foreignKeyName="fk_personal_name_person"/>
+            </column>
+            <column name="fullName" type="VARCHAR(200)" remarks="The full name of the person.">
+                <constraints nullable="false" checkConstraint="length(fullName) > 0"/>
+            </column>
+            <column name="fullNameLatinized" type="VARCHAR(200)"
+                    remarks="The full name of the person, in a Latin script.">
+                <constraints nullable="true" checkConstraint="length(fullNameLatinized) > 0"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="user" remarks="A user of the system.">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(200)" remarks="The user's name.">
+                <constraints nullable="false" checkConstraint="length(fullName) > 0" unique="true"/>
+            </column>
+            <column name="person_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="person" referencedColumnNames="id"
+                             foreignKeyName="fk_user_person"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

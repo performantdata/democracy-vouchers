@@ -22,6 +22,8 @@ lazy val `static` = (project in file("static"))
     description := "Static Web files for the \"democracy vouchers\" system.",
   )
 
+lazy val database = project
+
 lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin, DockerPlugin, GitVersioning, JlinkPlugin, JavaAppPackaging)
   .settings(
