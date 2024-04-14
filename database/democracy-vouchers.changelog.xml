@@ -5,13 +5,13 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
 >
     <changeSet id="1" author="UNKNOWN">
-        <createTable tableName="person" remarks="An instance of Homo sapiens.">
+        <createTable catalogName="person" tableName="person" remarks="An instance of Homo sapiens.">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
         </createTable>
 
-        <createTable tableName="personal_name" remarks="A name of a person.">
+        <createTable catalogName="person" tableName="personal_name" remarks="A name of a person.">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -28,7 +28,7 @@
             </column>
         </createTable>
 
-        <createTable tableName="user" remarks="A user of the system.">
+        <createTable catalogName="person" tableName="user" remarks="A user of the system.">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>

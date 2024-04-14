@@ -9,8 +9,14 @@ trait Database {
   /** A label, unique to this database type, to be used for naming JARs, etc. */
   val label: String
 
+  /** The subprotocol string used for this database type in a JDBC URL. */
+  def jdbcSubprotocol: String = label
+
   /** Name of the Docker image, at Docker Hub, for the database. */
   val image: String
+
+  /** User name of the database administrator built into the Docker image. */
+  val adminUser: String
 
   /** TCP port on which the database server listens inside its container. */
   val port: Int
@@ -21,8 +27,9 @@ trait Database {
 
 /** The latest version of the PostgreSQL database server. */
 case object PostgreSQL extends Database {
-  override val label          = "postgres"
+  override val label          = "postgresql"
   override val image          = "postgres:16.2"
+  override val adminUser      = "postgres"
   override val port           = 5432
   override val passwordEnvVar = "POSTGRES_PASSWORD"
 }
@@ -34,18 +41,29 @@ object DatabaseUtilities {
 
   /** Call the given function, providing it with a database service.
     *
-    * @param f function taking the URL of the database as its parameter
+    * @param f
+    *   function taking as its parameters:
+    *   1. the JDBC URL of the database
+    *   1. the database type
+    *   1. the administrator user's password
     */
-  def runWithDatabase(f: String => Unit, logger: ManagedLogger): Unit = {
+  def runWithDatabase(f: (String, Database, String) => Unit, logger: ManagedLogger): Unit = {
     val startContainerCommand =
       s"docker container run --detach --rm --publish-all --env ${database.passwordEnvVar}=$password ${database.image}"
     val containerId = runCommand(startContainerCommand, logger)
+    Thread.sleep(5000L)  //TODO Replace with port readiness test.
 
     val getPortCommand       = s"docker container port $containerId ${database.port}/tcp"
     val stopContainerCommand = s"docker container stop $containerId"
 
-    try
-      f(runCommand(getPortCommand, logger))
+    try {
+      val authority = runCommand(getPortCommand, logger)
+        .replace("0.0.0.0:", "127.0.0.1:")
+        .replace("[::]:", "[::1]:")
+
+      val url = s"jdbc:${database.jdbcSubprotocol}://$authority/"
+      f(url, database, password)
+    }
     finally
       () //runCommand(stopContainerCommand, logger)
   }
