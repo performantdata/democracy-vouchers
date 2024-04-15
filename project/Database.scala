@@ -23,6 +23,12 @@ trait Database {
 
   /** Name of the environment variable to set with the initial administrator password. */
   val passwordEnvVar: String
+
+  /** Name of the JDBC `Driver` class. */
+  val jdbcDriver: String
+
+  /** Slick profile class name. */
+  val slickProfile: String
 }
 
 /** The latest version of the PostgreSQL database server. */
@@ -32,6 +38,8 @@ case object PostgreSQL extends Database {
   override val adminUser      = "postgres"
   override val port           = 5432
   override val passwordEnvVar = "POSTGRES_PASSWORD"
+  override val jdbcDriver     = "org.postgresql.Driver"
+  override val slickProfile   = "slick.jdbc.PostgresProfile"
 }
 
 /** Utilities for running a Docker container for a database service. */
@@ -43,11 +51,10 @@ object DatabaseUtilities {
     *
     * @param f
     *   function taking as its parameters:
-    *   1. the JDBC URL of the database
+    *   1. the JDBC URL of the database, including credentials
     *   1. the database type
-    *   1. the administrator user's password
     */
-  def runWithDatabase(f: (String, Database, String) => Unit, logger: ManagedLogger): Unit = {
+  def runWithDatabase[A](f: (String, Database) => A, logger: ManagedLogger): A = {
     val startContainerCommand =
       s"docker container run --detach --rm --publish-all --env ${database.passwordEnvVar}=$password ${database.image}"
     val containerId = runCommand(startContainerCommand, logger)
@@ -61,11 +68,11 @@ object DatabaseUtilities {
         .replace("0.0.0.0:", "127.0.0.1:")
         .replace("[::]:", "[::1]:")
 
-      val url = s"jdbc:${database.jdbcSubprotocol}://$authority/"
-      f(url, database, password)
+      val url = s"jdbc:${database.jdbcSubprotocol}://$authority/?user=${database.adminUser}&password=$password"
+      f(url, database)
     }
     finally
-      () //runCommand(stopContainerCommand, logger)
+      runCommand(stopContainerCommand, logger)
   }
 
   /** Return the first line of standard output from the given command.

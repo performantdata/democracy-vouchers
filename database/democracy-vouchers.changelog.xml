@@ -19,10 +19,10 @@
                 <constraints nullable="false" referencedTableName="person" referencedColumnNames="id"
                              foreignKeyName="fk_personal_name_person"/>
             </column>
-            <column name="fullName" type="VARCHAR(200)" remarks="The full name of the person.">
+            <column name="full_name" type="VARCHAR(200)" remarks="The full name of the person.">
                 <constraints nullable="false" checkConstraint="length(fullName) > 0"/>
             </column>
-            <column name="fullNameLatinized" type="VARCHAR(200)"
+            <column name="full_name_latinized" type="VARCHAR(200)"
                     remarks="The full name of the person, in a Latin script.">
                 <constraints nullable="true" checkConstraint="length(fullNameLatinized) > 0"/>
             </column>
