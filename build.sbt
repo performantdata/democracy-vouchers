@@ -2,7 +2,7 @@ ThisBuild / organization := "com.performantdata"
 ThisBuild / organizationName := "Performant Data LLC"
 ThisBuild / versionScheme := Some("semver-spec")
 
-ThisBuild / scalaVersion := "3.3.1"
+ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / scalacOptions ++= Seq(
   "-encoding", "UTF-8",
   "-deprecation",

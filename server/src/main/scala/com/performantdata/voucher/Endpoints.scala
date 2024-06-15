@@ -11,7 +11,7 @@ import sttp.tapir.server.metrics.prometheus.PrometheusMetrics
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 object Endpoints {
-  private[this] case class User(name: String) extends AnyVal
+  private case class User(name: String) extends AnyVal
 
   val helloServerEndpoint: ServerEndpoint[Any, IO] = {
     val helloEndpoint: PublicEndpoint[User, Unit, String, Any] =

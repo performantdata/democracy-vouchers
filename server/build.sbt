@@ -2,31 +2,32 @@ import com.typesafe.sbt.packager.docker.DockerChmodType
 
 import java.time.Instant
 
-val calibanVersion = "2.5.1"
-val jacksonVersion = "2.15.2"
-val tapirVersion = "1.9.6"
+val calibanVer = "2.7.1"
+val jacksonVersion = "2.17.0"
+val tapirVersion = "1.10.8"
 
 name := "democracy-vouchers-server"
 description := "Back-end server for the \"democracy vouchers\" system."
 libraryDependencies ++= Seq(
   // GraphQL and HTTP server
-  "com.github.ghostdogpr" %% "caliban"        % calibanVersion,
-  "com.github.ghostdogpr" %% "caliban-http4s" % calibanVersion,
-  "com.github.ghostdogpr" %% "caliban-tapir"  % calibanVersion,
-  "org.http4s" %% "http4s-ember-server" % "0.23.25",
+  "com.github.ghostdogpr" %% "caliban"        % calibanVer,
+  "com.github.ghostdogpr" %% "caliban-http4s" % calibanVer,
+  "com.github.ghostdogpr" %% "caliban-tapir"  % calibanVer,
+  "org.http4s" %% "http4s-ember-server" % "0.23.27",
   "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"      % tapirVersion,
-  "com.softwaremill.sttp.tapir" %% "tapir-prometheus-metrics" % tapirVersion,
+  "com.softwaremill.sttp.tapir" %% "tapir-prometheus-metrics" % tapirVersion, //TODO Switch to OTel.
   "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle"  % tapirVersion,
   "com.softwaremill.sttp.tapir" %% "tapir-json-circe"         % tapirVersion,
 
   // logging
-  "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.22.1",
+  "org.typelevel" %% "log4cats-slf4j" % "2.6.0",
+  "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.23.1",
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
   "com.fasterxml.jackson.core"       % "jackson-databind"        % jacksonVersion,
 
-  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.18" % Test,
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Test,
-  "com.softwaremill.sttp.client3" %% "circe" % "3.9.2" % Test
+  "com.softwaremill.sttp.client3" %% "circe" % "3.9.7" % Test
 )
 
 // sbt-native-packager settings

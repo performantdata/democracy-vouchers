@@ -1,5 +1,10 @@
 // Build script for Slick code generation
 
+/** JDBC libraries of the supported databases. */
+val dbLibraries = Seq(
+  "org.postgresql" % "postgresql" % "42.7.3",
+)
+
 // Generate the code to the normal source location, so that it's commited to the VCS.
 (Compile / sourceManaged) := (Compile / scalaSource).value
 
@@ -10,15 +15,20 @@ lazy val LiquibaseConfig = config("liquibase").hide
 lazy val SlickgenConfig = config("slickgen").hide
 
 ivyConfigurations ++= LiquibaseConfig :: SlickgenConfig :: Nil
-libraryDependencies ++= Seq(
-  "org.liquibase" % "liquibase-core" % Versions.liquibase % LiquibaseConfig.name,
-  "info.picocli" % "picocli" % "4.7.5" % LiquibaseConfig.name,
 
-  "com.typesafe.slick" %% "slick-codegen" % Versions.slick % SlickgenConfig.name,
-  //TODO Add an SLF4J implementation % SlickgenConfig.name,
-) ++ Seq( // each of the supported databases
-  "org.postgresql" % "postgresql" % "42.7.3",
-).flatMap(l => l % LiquibaseConfig.name :: l % SlickgenConfig.name :: Nil)
+val jacksonVersion = "2.17.0"
+libraryDependencies ++=
+  Seq(
+    "org.liquibase" % "liquibase-core" % Versions.liquibase,
+    "info.picocli" % "picocli" % "4.7.6",
+  ).map(_ % LiquibaseConfig.name) ++
+  Seq(
+    "com.typesafe.slick" %% "slick-codegen" % Versions.slick,
+    "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.23.1",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % jacksonVersion,
+    "com.fasterxml.jackson.core"       % "jackson-databind"        % jacksonVersion,
+  ).map(_ % SlickgenConfig.name) ++
+  dbLibraries.flatMap(l => l % LiquibaseConfig.name :: l % SlickgenConfig.name :: Nil)
 
 // Fetch the needed classpaths (JARs).
 LiquibaseConfig / managedClasspath := {
@@ -60,12 +70,17 @@ slickgen := {
 
     val packageName  = s"com.performantdata.voucher.database.${db.label}"
     val outputDir    = (Compile / sourceManaged).value
+    val file         = outputDir / packageName.replace('.', '/') / "Tables.scala"
     val slickgenArgs = db.slickProfile :: db.jdbcDriver :: url :: outputDir.getPath :: packageName :: Nil
 
     runner.value.run(slickgenCliMainClassName, slickgenClasspathFiles, slickgenArgs, logger)
       .failed.foreach(t => sys.error(t.getMessage))
 
-    Seq(outputDir / packageName.replace('.', '/') / "Tables.scala")
+    /* Make file writeable so that scalac migration rewriting will work.
+     * (The compiler will still issue a warning first, but then do the rewrite.) */
+    IO.chmod("rw-r--r--", file)
+
+    Seq(file)
   }
 
   DatabaseUtilities.runWithDatabase(runSlickgen, logger)
