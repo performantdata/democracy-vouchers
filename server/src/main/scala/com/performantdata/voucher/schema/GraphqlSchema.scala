@@ -3,7 +3,6 @@ package com.performantdata.voucher.schema
 import caliban.*
 import caliban.schema.ArgBuilder.auto.*
 import caliban.schema.Schema.auto.*
-import com.performantdata.model.*
 
 /** The GraphQL schema for the democracy vouchers. */
 object GraphqlSchema {

@@ -1,4 +1,6 @@
-package com.performantdata.model
+package com.performantdata.voucher.schema
+
+import caliban.schema.Annotations.GQLDescription
 
 import java.time.LocalDate
 
@@ -16,7 +18,26 @@ import java.time.LocalDate
   *   `None` if non-existent or unknown.
   * @param birthDate Day on which this person was born (in the time zone he was born). `None` if unknown.
   */
-case class Person private (names: Seq[PersonalName], casualName: Option[String], birthDate: Option[LocalDate])
+@GQLDescription("""A person.
+                  |An individual human. This does not include corporations.""".stripMargin)
+case class Person private (
+  @GQLDescription(
+    """This person's name(s).
+      |The first name in the sequence is the person's "primary" name, the one which he would use in legal or government-interfacing contexts. There must be at least one."""
+      .stripMargin)
+  names: Seq[PersonalName],
+
+  @GQLDescription(
+    """The name that this person uses in a casual context.
+      |In some cultures—like the U.S.'s—its use may be preferred over the primary name in a business conversation. Null if non-existent or unknown."""
+      .stripMargin)
+  casualName: Option[String],
+  
+  @GQLDescription("Day on which this person was born (in the time zone he was born). Null if unknown.")
+  birthDate: Option[LocalDate]
+) {
+  require(names.nonEmpty)
+}
 
 object Person {
   /** Create a [[Person]], cleaning his names in the process. */
@@ -32,15 +53,21 @@ object Person {
   * 
   * @param fullName
   *   The complete, unabbreviated name of the person.
-  *   Parts of the name must be separated by the Unicode SPACE character, 0x0020.
+  *   Parts of the name must be separated by the Unicode SPACE character, U+0020.
+  *   (This implies that languages, like the East Asian ones, that don't normally use word segmentation
+  *   would need to use it here.)
   */
-case class PersonalName private (fullName: String) {
+case class PersonalName private (
+  @GQLDescription(
+    """The complete, unabbreviated name of the person.
+      |Parts of the name must be separated by the Unicode SPACE character, U+0020. (This implies that languages, like the East Asian ones, that don't normally use word segmentation would need to use it here.)"""
+      .stripMargin)
+  fullName: String
+) {
   require(validateFullName(fullName))
   
   /** Return whether the given full name is valid. */
-  private def validateFullName(fullName: String): Boolean = {
-    true
-  }
+  private def validateFullName(fullName: String): Boolean = true
 }
 
 object PersonalName {
