@@ -1,4 +1,5 @@
 # sbt-style output directory
+/project/target/
 /target/
 
 # npm

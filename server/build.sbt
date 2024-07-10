@@ -1,3 +1,4 @@
+import _root_.caliban.tools.Codegen
 import com.typesafe.sbt.packager.docker.DockerChmodType
 
 import java.time.Instant
@@ -5,6 +6,8 @@ import java.time.Instant
 val calibanVer = "2.7.1"
 val jacksonVersion = "2.17.0"
 val tapirVersion = "1.10.8"
+
+enablePlugins(BuildInfoPlugin, DockerPlugin, CalibanPlugin)
 
 name := "democracy-vouchers-server"
 description := "Back-end server for the \"democracy vouchers\" system."
@@ -29,6 +32,23 @@ libraryDependencies ++= Seq(
   "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub-server" % tapirVersion % Test,
   "com.softwaremill.sttp.client3" %% "circe" % "3.9.7" % Test
 )
+
+// sbt-buildinfo settings
+buildInfoKeys := Seq(name, version, scalaVersion, sbtVersion)
+buildInfoPackage := organization.value + ".voucher"
+
+/* caliban-codegen-sbt settings
+ * We follow a schema-first strategy: from a GraphQL schema, we generate the Scala types that describe the GraphQL API.
+ */
+Compile / caliban / calibanSettings += {
+  calibanSetting(file("myproject/src/main/resources/voucher.graphql"))(
+    // important to set this, otherwise you'll get client code
+    _.genType(Codegen.GenType.Schema)
+      // you can customize the codegen further with this DSL
+      .clientName("VoucherApi.scala")
+      .packageName("com.performantdata.voucher.schema")
+  )
+}
 
 // sbt-native-packager settings
 
@@ -88,9 +108,9 @@ dockerBaseImage := "debian:12.4-slim"
 dockerLabels ++= Map(
   "org.opencontainers.image.created"       -> Instant.now.toString,
   "org.opencontainers.image.authors"       -> "https://github.com/performantdata/",
-  "org.opencontainers.image.url"           -> "https://github.com/performantdata/democracy-vouchers/",
-  "org.opencontainers.image.documentation" -> "https://github.com/performantdata/democracy-vouchers/README.md",
-  "org.opencontainers.image.source"        -> "https://github.com/performantdata/democracy-vouchers/",
+  "org.opencontainers.image.url"           -> "https://github.com/performantdata/democracy-vouchers/server/",
+  "org.opencontainers.image.documentation" -> "https://github.com/performantdata/democracy-vouchers/server/README.md",
+  "org.opencontainers.image.source"        -> "https://github.com/performantdata/democracy-vouchers/server/",
   "org.opencontainers.image.version"       -> version.value,
   "org.opencontainers.image.revision"      -> git.gitHeadCommit.value.getOrElse(""),
   "org.opencontainers.image.vendor"        -> organizationName.value,
@@ -100,8 +120,15 @@ dockerLabels ++= Map(
 )
 dockerEnvVars ++= Map("LANG" -> "C.UTF-8")
 dockerExposedPorts := Seq(9000, 9443)
-dockerUsername := Some("performantdata")
 dockerUpdateLatest := true
 // We need a writable, searchable directory for log files.
 dockerAdditionalPermissions +=
   (DockerChmodType.UserGroupWriteExecute, (Docker / defaultLinuxInstallLocation).value + "/logs")
+
+// Map our special tasks to the DockerPlugin ones from sbt-native-packager.
+dockerBuild := {
+  (Docker / publishLocal).value
+}
+dockerPublish := {
+  (Docker / publish).value
+}

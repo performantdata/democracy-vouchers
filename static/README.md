@@ -5,7 +5,7 @@ This subproject contains the HTML and CSS files that comprise those static resou
 
 ## directory structure
 
-Although this isn't an [sbt][sbt] project,
+Although this isn't entirely an [sbt][sbt] project,
 the directory structure follows [that of a typical <code>sbt-web</code> project][sbt-web-layout]:
 
 | directory                 | use                         |
@@ -21,6 +21,9 @@ Web project configuration filesâ€”like `package.json` and `eleventy.config.js`â€
 The directory `src/main/public/` contains static Web files that will be copied to the output verbatim.
 There typically won't be much in here, since most files need to be processed.
 
+The `Dockerfile` is in its usual place, but don't expect to use it in a simple `docker build .` command;
+it's meant to be used from the top-level <code>sbt</code> build script, else its arguments won't be set correctly.
+
 ## tooling
 
 This subproject requires Node and `npm`.
@@ -35,6 +38,8 @@ Eleventy runs first, processing the files in `src/main/` into `target/web/public
 [Parcel][Parcel] runs next, processing the Eleventy output into `target/web/stage/`.
 (It also automatically pulls dependencies from the `node_modules` directory as needed.)
 
+The Docker image build requires [the Docker command-line tool][Docker-install].
+
 ## building the subproject
 
 Building the subproject requires the usual Node commands:
@@ -45,6 +50,10 @@ npm run build
 The first command downloads all required Node modules;
 the second runs the build tools.
 
+Building of the Docker image (which will automatically build the content pages as well)
+must be done from the top-level project directory.
+
+[Docker-install]: https://docs.docker.com/engine/install/
 [Eleventy]: https://www.11ty.dev/
 [Jamstack]: https://en.wikipedia.org/wiki/Jamstack
 [node-install]: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
