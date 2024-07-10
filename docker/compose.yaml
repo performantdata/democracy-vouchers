@@ -1,0 +1,89 @@
+# Docker Compose configuration for the Democracy Vouchers system
+
+# This is the basic configuration, designed to run the system in a production-like mode, but without the scaling.
+# (If you need production-level scaling, use Kubernetes instead.)
+
+name: democracy-vouchers
+
+services:
+#  database:
+#    image: postgres
+#    networks:
+#      - keycloak-db
+#      - server-db
+#      - otel-input
+#
+#  # AuthN/Z server
+#  keycloak:
+#    image: quay.io/keycloak/keycloak
+#    networks:
+#      - otel-input
+
+  # static client files server & DoS guard
+  front-door:
+    image: performantdata/democracy-vouchers-static
+    ports:
+      - name: web
+        target: 80
+        host_ip: 127.0.0.1
+        published: "8080"
+        protocol: tcp
+        app_protocol: http
+#    networks:
+#      - otel-input
+
+#  # GraphQL / HTTP server
+#  server:
+#    image: performantdata/democracy-vouchers-server
+#    networks:
+#      - otel-input
+#
+#  # OpenTelemetry Collector
+#  otel-collector:
+#    image: otel/opentelemetry-collector
+#    networks:
+#      - otel-input
+#      - otel-output
+#
+#  # log database
+#  loki:
+#    image: grafana/loki
+#    networks:
+#      - grafana
+#      - otel-output
+#
+#  # trace database
+#  tempo:
+#    image: grafana/tempo
+#    networks:
+#      - grafana
+#      - otel-output
+#
+#  # metrics database
+#  mimir:
+#    image:
+#    networks:
+#      - grafana
+#      - otel-output
+#
+#  # Grafana
+#  grafana:
+#    image: grafana/grafana
+#    networks:
+#      - grafana
+#
+#volumes:
+#  static-files:
+#
+#
+#  db-data:
+#
+#
+#networks:
+#  front-keycloak: {}
+#  front-server: {}
+#  keycloak-db: {}
+#  server-db: {}
+#  grafana: {}
+#  otel-output: {}
+#  otel-input: {}
