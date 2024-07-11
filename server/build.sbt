@@ -108,9 +108,9 @@ dockerBaseImage := "debian:12.4-slim"
 dockerLabels ++= Map(
   "org.opencontainers.image.created"       -> Instant.now.toString,
   "org.opencontainers.image.authors"       -> "https://github.com/performantdata/",
-  "org.opencontainers.image.url"           -> "https://github.com/performantdata/democracy-vouchers/server/",
-  "org.opencontainers.image.documentation" -> "https://github.com/performantdata/democracy-vouchers/server/README.md",
-  "org.opencontainers.image.source"        -> "https://github.com/performantdata/democracy-vouchers/server/",
+  "org.opencontainers.image.url"           -> "https://github.com/performantdata/democracy-vouchers/tree/master/server/",
+  "org.opencontainers.image.documentation" -> "https://github.com/performantdata/democracy-vouchers/blob/master/server/README.md",
+  "org.opencontainers.image.source"        -> "https://github.com/performantdata/democracy-vouchers/tree/master/server/",
   "org.opencontainers.image.version"       -> version.value,
   "org.opencontainers.image.revision"      -> git.gitHeadCommit.value.getOrElse(""),
   "org.opencontainers.image.vendor"        -> organizationName.value,

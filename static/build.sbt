@@ -30,6 +30,7 @@ dockerBuild := {
     (target.value / "web" / "public" / "main").toString
   )
 
+  // Build the static content, and the Docker image from that.
   (Process("npm install", cwd) #&&
     Process("npm run build", cwd) #&&
     Process(command, cwd)).!

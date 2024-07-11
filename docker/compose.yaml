@@ -6,45 +6,39 @@
 name: democracy-vouchers
 
 services:
-#  database:
-#    image: postgres
-#    networks:
-#      - keycloak-db
-#      - server-db
-#      - otel-input
-#
-#  # AuthN/Z server
-#  keycloak:
-#    image: quay.io/keycloak/keycloak
-#    networks:
-#      - otel-input
-
   # static client files server & DoS guard
   front-door:
     image: performantdata/democracy-vouchers-static
     ports:
-      - name: web
-        target: 80
-        host_ip: 127.0.0.1
-        published: "8080"
-        protocol: tcp
-        app_protocol: http
-#    networks:
-#      - otel-input
+    - name: web
+      target: 80
+      host_ip: 127.0.0.1
+      published: "8080"
+      protocol: tcp
+      app_protocol: http
+    networks:
+    - otel-input
+    depends_on:
+      otel-collector:
+        # Collector health check doesn't really work:
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/11780
+        #condition: service_healthy
+        condition: service_started
+        required: false
 
-#  # GraphQL / HTTP server
-#  server:
-#    image: performantdata/democracy-vouchers-server
-#    networks:
-#      - otel-input
-#
-#  # OpenTelemetry Collector
-#  otel-collector:
-#    image: otel/opentelemetry-collector
-#    networks:
-#      - otel-input
-#      - otel-output
-#
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    expose:
+    - "4318/tcp"  # OTLP over HTTP
+    - "55679/tcp" # zPages
+    configs:
+    - source: otel-collector
+      target: /etc/otelcol-contrib/config.yaml
+    networks:
+    - otel-input
+    - otel-output
+
 #  # log database
 #  loki:
 #    image: grafana/loki
@@ -66,6 +60,25 @@ services:
 #      - grafana
 #      - otel-output
 #
+#  database:
+#    image: postgres
+#    networks:
+#      - keycloak-db
+#      - server-db
+#      - otel-input
+#
+#  # AuthN/Z server
+#  keycloak:
+#    image: quay.io/keycloak/keycloak
+#    networks:
+#      - otel-input
+
+#  # GraphQL / HTTP server
+#  server:
+#    image: performantdata/democracy-vouchers-server
+#    networks:
+#      - otel-input
+
 #  # Grafana
 #  grafana:
 #    image: grafana/grafana
@@ -78,12 +91,16 @@ services:
 #
 #  db-data:
 #
-#
-#networks:
+
+configs:
+  otel-collector:
+    file: otelcol-contrib-config.yaml
+
+networks:
 #  front-keycloak: {}
 #  front-server: {}
 #  keycloak-db: {}
 #  server-db: {}
 #  grafana: {}
-#  otel-output: {}
-#  otel-input: {}
+  otel-output: {}
+  otel-input: {}
