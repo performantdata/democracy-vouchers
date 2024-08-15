@@ -1,106 +1,82 @@
 # Docker Compose configuration for the Democracy Vouchers system
 
-# This is the basic configuration, designed to run the system in a production-like mode, but without the scaling.
-# (If you need production-level scaling, use Kubernetes instead.)
+# This is the basic configuration, designed to run the system for local development: in a production-like configuration,
+# but without the scaling or restarts.
+# (If you need production-level scaling and resilience, use Kubernetes instead.)
 
 name: democracy-vouchers
 
 services:
-  # static client files server & DoS guard
-  front-door:
-    image: performantdata/democracy-vouchers-static
+  # S3-compatible object storage for Grafana services
+  grafana-object-storage:
+    image: minio/minio
     ports:
-    - name: web
-      target: 80
+    - name: grafana-minio-console
+      target: 9001
       host_ip: 127.0.0.1
-      published: "8080"
+      published: "9001"
       protocol: tcp
       app_protocol: http
     networks:
-    - otel-input
+    - keycloak
+    volumes:
+    - type: bind
+      source: ../data/minio
+      target: /data
+    environment:
+      MINIO_ROOT_USER: ROOTUSER
+      MINIO_ROOT_PASSWORD: CHANGEME123
+    command: [ "server", "/data", "--console-address", ":9001" ]
     depends_on:
-      otel-collector:
-        # Collector health check doesn't really work:
-        # https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/11780
-        #condition: service_healthy
+      keycloak:
         condition: service_started
-        required: false
+        required: true
 
-  # OpenTelemetry Collector
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    expose:
-    - "4318/tcp"  # OTLP over HTTP
-    - "55679/tcp" # zPages
-    configs:
-    - source: otel-collector
-      target: /etc/otelcol-contrib/config.yaml
+  # AuthN/Z server
+  keycloak:
+    image: quay.io/keycloak/keycloak
     networks:
-    - otel-input
-    - otel-output
+    - keycloak
+    - postgres
+    depends_on:
+      postgres:
+        condition: service_started
+        required: true
 
-#  # log database
-#  loki:
-#    image: grafana/loki
-#    networks:
-#      - grafana
-#      - otel-output
-#
-#  # trace database
-#  tempo:
-#    image: grafana/tempo
-#    networks:
-#      - grafana
-#      - otel-output
-#
-#  # metrics database
-#  mimir:
-#    image:
-#    networks:
-#      - grafana
-#      - otel-output
-#
-#  database:
-#    image: postgres
-#    networks:
-#      - keycloak-db
-#      - server-db
-#      - otel-input
-#
-#  # AuthN/Z server
-#  keycloak:
-#    image: quay.io/keycloak/keycloak
-#    networks:
-#      - otel-input
-
-#  # GraphQL / HTTP server
-#  server:
-#    image: performantdata/democracy-vouchers-server
-#    networks:
-#      - otel-input
-
-#  # Grafana
-#  grafana:
-#    image: grafana/grafana
-#    networks:
-#      - grafana
-#
-#volumes:
-#  static-files:
-#
-#
-#  db-data:
-#
+  # PostgreSQL database for all services that need it
+  postgres:
+    image: postgres:16
+    shm_size: 128mb
+    volumes:
+    - type: volume
+      source: postgres-data
+      target: /var/lib/postgresql/data
+      volume:
+        nocopy: true
+    ports:
+    - target: 5432
+      host_ip: 127.0.0.1
+      published: "5432"
+      protocol: tcp
+    networks:
+    - postgres
+    configs:
+    - source: postgres
+      target: /docker-entrypoint-initdb.d/init-dbs.sh
+    environment:
+      POSTGRES_PASSWORD: postgres
 
 configs:
-  otel-collector:
-    file: otelcol-contrib-config.yaml
+  postgres:
+    file: postgres/init-dbs.sh
+
+volumes:
+  postgres-data:
 
 networks:
-#  front-keycloak: {}
-#  front-server: {}
-#  keycloak-db: {}
-#  server-db: {}
-#  grafana: {}
-  otel-output: {}
-  otel-input: {}
+  keycloak:
+    labels:
+      description: Network for access to the KeyCloak service.
+  postgres:
+    labels:
+      description: Network for access to the PostgreSQL database.

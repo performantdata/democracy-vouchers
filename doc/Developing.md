@@ -1,4 +1,10 @@
 # Developing this project
+## design
+
+The application runs from OCI containers.
+For running locally, there is [a Docker Compose configuration](../docker/compose.yaml);
+for production, there will be an equivalent Kubernetes configuration.
+
 ## publishing the application
 
 The `sbt Docker/publish` command compiles the code, packages the application, and publishes it to Docker Hub.
